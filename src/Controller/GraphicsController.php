@@ -11,7 +11,7 @@ class GraphicsController {
      */
     public function index() {
 
-        return new Response('<html><body>category list</body></html>');
+        return new Response('<html><body>graphics list</body></html>');
     }
 
 }
