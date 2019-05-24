@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class GraphicsController {
+class GraphicsController extends AbstractController {
     /**
-     * @Route("/graphics")
+     * @Route("/graphics", name="graphics")
      */
     public function index() {
 
-        return new Response('<html><body>graphics list</body></html>');
+        return $this->render('graphics/graphics.html.twig');
     }
 
 }
