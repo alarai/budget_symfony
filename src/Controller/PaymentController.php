@@ -2,30 +2,55 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Moyen;
+use App\Form\MoyenType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class PaymentController {
+class PaymentController extends AbstractController  {
     /**
-     * @Route("/payment")
+     * @Route("/payment", name="payment")
      */
     public function index() {
+        $paymentList = $this->getDoctrine()->getRepository(Moyen::class)->findBy([], ["nom" => "ASC"]);
 
-        return new Response('<html><body>Payment list</body></html>');
+        return $this->render('payment/payment.html.twig', ["payments" => $paymentList]);
+    }
+
+    private function getPayment($id) {
+        if($id !== null) {
+            $payment = $this->getDoctrine()->getRepository(Moyen::class)->find($id);
+            if($payment === null) {
+                return $this->redirectToRoute('payment');
+            }
+        } else {
+            $payment = new Moyen();
+        }
+
+        return $payment;
     }
 
     /**
-     * @Route("/payment/add")
+     * @Route("/payment/edit/{id<\d+>}", name="payment_edit", defaults={"id"=null})
      */
-    public function add() {
-        return new Response('<html><body>Payment add</body></html>');
-    }
+    public function edit($id, Request $request) {
 
-    /**
-     * @Route("/payment/edit/{id<\d+>}")
-     */
-    public function edit($id) {
-        return new Response('<html><body>Payment edit ' . $id . '</body></html>');
+        $payment = $this->getPayment($id);
+
+        $form = $this->createForm(MoyenType::class, $payment);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($payment);
+            $em->flush();
+            $this->addFlash('success', 'Moyen de paiement ' . ($id===null?"ajouté":"mis à jour"));
+            return $this->redirectToRoute('payment');
+        }
+
+        return $this->render('payment/edit.html.twig', ['form' => $form->createView()]);
     }
 
 }

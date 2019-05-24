@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Moyen
@@ -25,6 +26,7 @@ class Moyen
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=45, nullable=false)
+     * @Assert\NotBlank
      */
     private $nom;
 

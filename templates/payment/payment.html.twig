@@ -1,12 +1,20 @@
 {% extends "base.html.twig" %}
 
-<h1>Moyen de Paiement</h1>
+{%  block body %}
+    <h1>Moyen de paiement</h1>
 
-<p><a href="/payment/add" class="btn btn-primary">Ajouter une moyen</a></p>
-<p><a href="/payment/edit/2">CB AURELIEN</a></p>
-<p><a href="/payment/edit/3">CB LI</a></p>
-<p><a href="/payment/edit/8">CB VISA AURELIEN</a></p>
-<p><a href="/payment/edit/4">CHEQUE</a></p>
-<p><a href="/payment/edit/5">DEPOT</a></p>
-<p><a href="/payment/edit/7">PRELEVEMENT</a></p>
-<p><a href="/payment/edit/1">VIREMENT</a></p>
+    {% for label, messages in app.flashes %}
+        {%  for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {%  endfor %}
+    {% endfor %}
+
+    <p><a href="{{ path('payment_edit') }}" class="btn btn-primary">Ajouter une moyen</a></p>
+
+    {%  for payment in payments %}
+        <p><a href="{{ path('payment_edit', {id: payment.idmoyen}) }}">{{ payment.nom }}</a></p>
+    {% endfor %}
+
+{%  endblock body %}
