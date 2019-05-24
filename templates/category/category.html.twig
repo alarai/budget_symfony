@@ -1,1 +1,20 @@
 {% extends "base.html.twig" %}
+
+{%  block body %}
+    <h1>Catégories</h1>
+
+    {% for label, messages in app.flashes %}
+        {%  for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {%  endfor %}
+    {% endfor %}
+
+    <p><a href="{{ path('category_edit') }}" class="btn btn-primary">Ajouter une catégorie</a></p>
+
+    {%  for category in categories %}
+        <p><a href="{{ path('category_edit', {id: category.idcategories }) }}">{{ category.nom }}</a></p>
+    {% endfor %}
+
+{%  endblock body %}
