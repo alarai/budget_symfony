@@ -1,1 +1,39 @@
 {% extends "base.html.twig" %}
+
+{%  block body %}
+    <h1>Opérations récurrentes</h1>
+
+    {% for label, messages in app.flashes %}
+        {%  for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {%  endfor %}
+    {% endfor %}
+
+    <p><a href="{{ path('recuring_edit') }}" class="btn btn-primary">Ajouter une opération</a></p>
+    <table class="table table-condensed table-responsive">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Moyen</th>
+            <th>Débit</th>
+            <th>Crédit</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            {%  for op in ops %}
+                <tr>
+                    <td>{{ op.nom }}</td>
+                    <td>{{ op.categorie.nom }}</td>
+                    <td>{{ op.moyen.nom }}</td>
+                    <td>{% if op.valeur < 0 %}{{ op.valeur }}{%  endif %}</td>
+                    <td>{% if op.valeur >= 0 %}{{ op.valeur }}{%  endif %}</td>
+                    <td><a href="{{ path('recuring_edit', {'id': op.idopRecur}) }}" class="btn btn-primary btn-xs">Modifier</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{%  endblock %}

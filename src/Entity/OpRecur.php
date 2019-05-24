@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * OpRecur
@@ -32,6 +33,7 @@ class OpRecur
      * @var float
      *
      * @ORM\Column(name="valeur", type="float", precision=10, scale=0, nullable=false)
+     * @Assert\Type(type="float")
      */
     private $valeur = '0';
 
