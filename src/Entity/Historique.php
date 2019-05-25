@@ -8,9 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
  * Historique
  *
  * @ORM\Table(name="historique", indexes={@ORM\Index(name="fk_courant_moyen_idx", columns={"moyen"}), @ORM\Index(name="fk_courant_categories_idx", columns={"categorie"}), @ORM\Index(name="fk_historique_oprecur", columns={"op_recur"})})
- * @ORM\Entity
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\HistoriqueRepository")
  */
-class Historique
+class Historique implements \JsonSerializable
 {
     /**
      * @var int
@@ -185,6 +186,17 @@ class Historique
         $this->opRecur = $opRecur;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return array(
+            'date' => $this->date->format('Y-m-d'),
+            'nom' => $this->nom,
+            'valeur' => $this->valeur,
+            'nomMoyen' => $this->getMoyen()->getNom(),
+            'nomCategorie' => $this->getCategorie()->getNom(),
+        );
     }
 
 
