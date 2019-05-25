@@ -13,16 +13,20 @@ class HistoriqueRepository extends ServiceEntityRepository
         parent::__construct($registry, Historique::class);
     }
 
-    public function getMonthList() {
+    public function getMonthList($limit = -1) {
         $qb = $this->createQueryBuilder('h')
                     ->select(['h.annee', 'h.mois'])
                     ->groupBy('h.annee')
                     ->addGroupBy('h.mois')
                     ->orderBy('h.annee', 'DESC')
-                    ->addOrderBy('h.mois', 'DESC')
-                    ->getQuery();
+                    ->addOrderBy('h.mois', 'DESC');
 
-        return $qb->execute();
+        if($limit != -1) {
+            $qb = $qb->setMaxResults($limit);
+        }
+
+
+        return $qb->getQuery()->execute();
     }
 
     public function getMonthListByCat($year, $month) {
@@ -39,5 +43,24 @@ class HistoriqueRepository extends ServiceEntityRepository
             ->getQuery();
 
         return $qb->execute();
+    }
+
+    public function chartHistoryData($yearMin) {
+        $db = $this->getEntityManager()->getConnection();
+
+        $sql = "    SELECT CONCAT(CAST(mois AS Char),'/',CAST(annee AS CHAR)) AS period,  ROUND(SUM(valeur),2) AS somme
+                    FROM historique o  
+                    WHERE annee >= ?
+                    GROUP BY annee, mois               
+               UNION
+                    SELECT 'en cours' AS period, ROUND(SUM(valeur),2) AS somme
+                    FROM courant o     
+                    GROUP BY period";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(1, $yearMin, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 }

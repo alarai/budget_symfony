@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1>Historique</h1>
-    {{ annee }}/{{ mois }}
+
     <div class="row form-inline">
         <div class="col-xs-2">
             <button id="btnNextPeriod" class="btn btn-primary">&lt;&lt;</button>
@@ -51,7 +51,7 @@
         var chart;
         var monthList = [
             {% for monthyear in liste %}
-            {%  if loop.index0 > 0 %},{% endif %}{id: {{ loop.index0 }}, month: {{ monthyear.mois }}, year: {{ monthyear.annee }}, text:'{{ monthyear.annee }}/{{ monthyear.mois }}'}
+            {%  if loop.index0 > 0 %},{% endif %}{id: {{ loop.index0 }}, month: {{ monthyear.mois|pad(2,'0',true) }}, year: {{ monthyear.annee }}, text:'{{ monthyear.annee }}/{{ monthyear.mois|pad(2,'0',true) }}'}
             {% endfor %}];
         var current ='2019/05';
 
@@ -87,7 +87,6 @@
                 .prop("selected", false)
                 .prev()
                 .prop("selected", true);
-            refreshBtns();
             refreshDatatable();
         }
 
@@ -104,6 +103,7 @@
                     data.data.map(function(val) { val.y = Number.parseFloat(val.y); });
                     chart.addSeries(data);
                     $(".form-control,.btn").attr('disabled', false);
+                    refreshBtns();
                 },
                 cache: false
             });

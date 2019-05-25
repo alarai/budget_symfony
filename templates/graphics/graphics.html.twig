@@ -1,1 +1,57 @@
 {% extends "base.html.twig" %}
+
+{% set categories = "" %}
+{% set values = "" %}
+
+{% for row in data %}
+    {% if loop.index0 > 0 %}
+        {% set categories = categories ~ ',' %}
+        {% set values = values ~ ',' %}
+    {% endif %}
+    {% set categories = categories ~ '\'' ~ row.period|pad(7,'0', true) ~'\'' %}
+    {% set values = values ~ row.somme  %}
+{% endfor %}
+
+{% block body %}
+    <h1>Graphiques</h1>
+
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-xs-12">
+            <div id="balanceChart" style="min-width: 310px; height: 600px; max-width: 1170px; margin: 0 auto"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        Highcharts.chart('balanceChart', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Balance mensuelle'
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} €</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            xAxis: {
+                categories: [{{ categories|raw }}]
+            },
+            yAxis: {
+                type: 'logarithmic',
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Balance',
+                data: [{{ values }}]
+            }]
+        });
+    </script>
+{% endblock %}
