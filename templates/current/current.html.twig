@@ -54,6 +54,29 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="confirmRemove" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes vous sûr de vouloir supprimer l'opération  ?<br />
+                    Cette action ne peut être annulée.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnConfirm">Confirmer</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -61,6 +84,7 @@
     <script>
         var dataTable;
         var chart;
+        var selectedRemoval;
 
         function loadOpRecurNotUsed() {
             $.ajax({
@@ -90,6 +114,11 @@
                 },
                 cache: false
             });
+        }
+
+        function removeOperationCheck(id) {
+            $("#btnConfirm").data('id', id);
+            $("#confirmRemove").modal('show');
         }
 
         function removeOperation(id) {
@@ -234,8 +263,16 @@
                     });
                 }
             });
+            $("#btnConfirm").click(function() {
+               removeOperation(selectedRemoval.data('id'));
+               $("#confirmRemove").modal('hide');
+            });
             $('body').tooltip({
                 selector: '[data-toggle="tooltip"]'
+            });
+            $("#confirmRemove").on('hide.bs.modal', function() {
+                selectedRemoval.find('i').removeClass('fa-spinner fa-spin').addClass('fa-trash');
+                selectedRemoval = null;
             });
             $(document).on('click', ".actionStatus", function() {
                 $(this).find('i').removeClass('text-success text-danger fa-check fa-times').addClass('fa-spinner fa-spin');
@@ -243,7 +280,8 @@
             });
             $(document).on('click', ".actionRemove", function() {
                 $(this).find('i').removeClass('fa-trash').addClass('fa-spinner fa-spin');
-                removeOperation($(this).data('id'));
+                selectedRemoval= $(this);
+                removeOperationCheck($(this).data('id'));
             });
         });
     </script>
