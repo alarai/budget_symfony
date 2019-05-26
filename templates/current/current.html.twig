@@ -1,1 +1,250 @@
 {% extends "base.html.twig" %}
+
+{% block body %}
+    <h1>Mois en cours</h1>
+
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-xs-12">
+            <div id="currentChart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        </div>
+    </div>
+    {% for label, messages in app.flashes %}
+        {%  for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {%  endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <form class="form-inline">
+                <a href="{{ path('current_edit') }}" class="btn btn-primary">Ajouter une nouvelle opération</a>
+                Ou
+
+                <div class="form-group">
+                      <select class="form-control" id="ddlOpRecur">
+                      </select>
+                </div>
+                <a class="btn btn-primary" id="btnAddRecur" disabled="disabled">Ajouter</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-xs-12">
+            <table id="currentTable" class="display" style="width:100%; padding-top: 10px;">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Moyen</th>
+                    <th>Valeur</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th colspan="4" style="text-align:right">Total:</th>
+                    <th></th>
+
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="{{ asset('/js/highcharts.min.js') }}"></script>
+    <script>
+        var dataTable;
+        var chart;
+
+        function loadOpRecurNotUsed() {
+            $.ajax({
+                url: "{{ path('recuring_notused') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $("#ddlOpRecur").find("option").remove();
+                    $("#ddlOpRecur").append($("<option />").val(-1).text("Opération Récurrente" + (data.data.length > 1?'s ':' ') + '(' + data.data.length + ')'));
+                    data.data.map(function(op) {
+                        $("#ddlOpRecur").append($("<option />").val(op.idopRecur).text(op.nomCategorie + ' ' + op.nom + ' (' + op.valeur + ')'));
+                    });
+                    $("#btnAddRecur").attr('disabled', true);
+                },
+                cache: false
+            });
+        }
+
+        function changeStatus(id, state) {
+            $.ajax({
+                url: "{{ path('current_status') }}/" + id + "/" + (state?1:0),
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                   dataTable.ajax.reload();
+                   updateChart();
+                },
+                cache: false
+            });
+        }
+
+        function removeOperation(id) {
+            $.ajax({
+                url: "{{ path('current_remove') }}/" + id,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    dataTable.ajax.reload();
+                    updateChart();
+                },
+                cache: false
+            });
+        }
+
+        function updateChart() {
+            $.ajax({
+                url: "{{ path('current_listcat') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    if(chart.get('expenses')) {
+                        chart.get('expenses').remove();
+                    }
+                    data.data.map(function(val) { val.y = Number.parseFloat(val.y); });
+                    chart.addSeries(data);
+                },
+                cache: false
+            });
+        }
+
+        $(function () {
+            dataTable = $("#currentTable").DataTable( {
+                "ajax": "{{ path('current_list') }}",
+                "columnDefs": [ {
+                    "targets": 0,
+                    "data": "date",
+                },{
+                    "targets": 1,
+                    "data": "nom",
+                },{
+                    "targets": 2,
+                    "data": "nomCategorie",
+                },{
+                    "targets": 3,
+                    "data": "nomMoyen",
+                },{
+                    "targets": 4,
+                    "data": "valeur",
+                },{
+                    "targets": 5,
+                    "width": "90px",
+                    "orderable": false,
+                    "render": function(data, type, row) {
+                        return '<a class="btn btn-xs actionStatus" data-toggle="tooltip" data-placement="top" title="status" data-id="' + row.idCourant + '"><i class="fas fa-' + (row.surcompte ? 'check text-success' : 'times text-danger') + '" style=""></i></a><a class="btn btn-primary btn-xs" href="{{ path('current_edit') }}/' + row.idCourant + '" data-toggle="tooltip" data-placement="top" title="Editer"><i class="fas fa-edit"></i></a> <a class="btn btn-danger btn-xs actionRemove" data-toggle="tooltip" data-placement="top" title="supprimer" data-id="' + row.idCourant + '"><i class="fas fa-trash"></i></a>';
+                    },
+                }],
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "pageLength": -1,
+                "order": [[ 0, "desc" ]],
+                "footerCallback": function ( row, data, start, end, display ) {
+                    var api = this.api(), data;
+
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '')*1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+
+                    // Total over all pages
+                    total = api
+                        .column( 4 )
+                        .data()
+                        .reduce( function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0 );
+
+                    // Total over this page
+                    pageTotal = api
+                        .column( 4, { page: 'current'} )
+                        .data()
+                        .reduce( function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0 );
+
+                    // Update footer
+                    $( api.column( 4 ).footer() ).html(
+                        total.toFixed(2)
+                    );
+                }
+            });
+
+            var options = {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Répartition'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.2f} ({point.percentage:.1f}%)</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                            }
+                        }
+                    }
+                },
+                series: []
+            };
+
+            chart = Highcharts.chart('currentChart', options);
+            updateChart();
+            loadOpRecurNotUsed();
+
+            $("#ddlOpRecur").change(function() {
+                $("#btnAddRecur").attr('disabled', $("#ddlOpRecur option:selected").val() === "-1");
+            });
+            $("#btnAddRecur").click(function() {
+                if(!$(this).attr('disabled')) {
+                    $.ajax({
+                        url: "{{ path('current_addrecur') }}/" + $("#ddlOpRecur option:selected").val(),
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            loadOpRecurNotUsed();
+                            dataTable.ajax.reload();
+                        },
+                        cache: false
+                    });
+                }
+            });
+            $('body').tooltip({
+                selector: '[data-toggle="tooltip"]'
+            });
+            $(document).on('click', ".actionStatus", function() {
+                $(this).find('i').removeClass('text-success text-danger fa-check fa-times').addClass('fa-spinner fa-spin');
+                changeStatus($(this).data('id'), !$(this).find('i').hasClass('text-success'));
+            });
+            $(document).on('click', ".actionRemove", function() {
+                $(this).find('i').removeClass('fa-trash').addClass('fa-spinner fa-spin');
+                removeOperation($(this).data('id'));
+            });
+        });
+    </script>
+{% endblock %}

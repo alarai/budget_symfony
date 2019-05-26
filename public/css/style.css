@@ -39,3 +39,7 @@ div.container a.brand {
 .nav > li > a {
     cursor: pointer;
 }
+
+i.fas {
+    width: 10px;
+}

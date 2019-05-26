@@ -9,9 +9,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  * OpRecur
  *
  * @ORM\Table(name="op_recur", indexes={@ORM\Index(name="fk_oprecur_moyen_idx", columns={"moyen"}), @ORM\Index(name="fk_oprecur_categories_idx", columns={"categorie"})})
- * @ORM\Entity
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\OpRecurRepository")
  */
-class OpRecur
+class OpRecur implements \JsonSerializable
 {
     /**
      * @var int
@@ -110,5 +111,15 @@ class OpRecur
         return $this;
     }
 
+    public function jsonSerialize()
+    {
+        return array(
+            'idopRecur' => $this->idopRecur,
+            'nom' => $this->nom,
+            'valeur' => $this->valeur,
+            'nomMoyen' => $this->getMoyen()->getNom(),
+            'nomCategorie' => $this->getCategorie()->getNom(),
+        );
+    }
 
 }

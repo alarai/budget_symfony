@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Courant
  *
  * @ORM\Table(name="courant", indexes={@ORM\Index(name="fk_courant_moyen_idx", columns={"moyen"}), @ORM\Index(name="fk_courant_categories_idx", columns={"categorie"}), @ORM\Index(name="fk_courant_oprecur", columns={"op_recur"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CourantRepository")
  */
-class Courant
+class Courant implements \JsonSerializable
 {
     /**
      * @var int
@@ -78,6 +78,12 @@ class Courant
      * })
      */
     private $opRecur;
+
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+        $this->opRecur = null;
+    }
 
     public function getIdcourant(): ?int
     {
@@ -168,5 +174,16 @@ class Courant
         return $this;
     }
 
-
+    public function jsonSerialize()
+    {
+        return array(
+            'idCourant' => $this->idcourant,
+            'date' => $this->date->format('Y-m-d'),
+            'nom' => $this->nom,
+            'valeur' => $this->valeur,
+            'nomMoyen' => $this->getMoyen()->getNom(),
+            'nomCategorie' => $this->getCategorie()->getNom(),
+            'surcompte' => $this->getSurcompte()
+        );
+    }
 }

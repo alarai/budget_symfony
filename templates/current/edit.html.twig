@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+
+{%  block body %}
+    <h1>Ajout d'une opération</h1>
+
+    {{ form(form) }}
+
+{%  endblock body %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="{{ asset('/js/bootstrap-datepicker.js') }}"></script>
+    <script>
+        $('.js-datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    </script>
+{% endblock %}

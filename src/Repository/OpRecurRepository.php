@@ -12,4 +12,13 @@ class OpRecurRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, OpRecur::class);
     }
+
+    public function getNotUsedInCourant() {
+        $used = $this->createQueryBuilder('c1')->select('c1.idopRecur')->join('App\Entity\Courant', 'c2', 'WITH', 'c1.idopRecur = c2.opRecur');
+
+        $notUsed = $this->createQueryBuilder('c3');
+        $notUsed->where('c3.valeur <> 0')->andWhere($notUsed->expr()->notIn('c3.idopRecur', $used->getDQL()));
+
+        return $notUsed->getQuery()->execute();
+    }
 }

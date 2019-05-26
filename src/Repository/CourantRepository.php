@@ -12,4 +12,16 @@ class CourantRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Courant::class);
     }
+
+    public function getByCategorie() {
+        $qb = $this->createQueryBuilder('c')
+            ->select("ABS(SUM(c.valeur)) AS y, cat.nom AS name")
+            ->innerJoin('App\Entity\Categories', 'cat', 'WITH', 'c.categorie = cat.idcategories')
+            ->groupBy('c.categorie')
+            ->where('c.opRecur IS NULL')
+            ->andWhere('c.valeur < 0')
+            ->getQuery();
+
+        return $qb->execute();
+    }
 }

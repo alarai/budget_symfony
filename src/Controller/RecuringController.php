@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\OpRecur;
 use App\Form\RecuringType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -51,6 +52,17 @@ class RecuringController extends AbstractController {
         }
 
         return $this->render('recuring/edit.html.twig', ['form' => $form->createView()]);
+    }
+
+    /**
+     * @Route("/recuring/api/listnotused", name="recuring_notused")
+     */
+    public function listNotUsedOperations() {
+        $opRecurList = $this->getDoctrine()->getRepository(OpRecur::class)->getNotUsedInCourant();
+
+        return new JsonResponse(
+            ["data" => $opRecurList]
+        );
     }
 
 }
