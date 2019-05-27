@@ -18,13 +18,17 @@ class RecuringType extends AbstractType {
         $builder->add('nom', TextType::class)
             ->add('categorie', EntityType::class, [
                 'class' => Categories::class,
-                'choice_label' => 'nom'
+                'choice_label' => 'nom',
+                'label' => 'Catégorie d\'opération',
             ])
             ->add('moyen', EntityType::class, [
                 'class' => Moyen::class,
-                'choice_label' => 'nom'
+                'choice_label' => 'nom',
+                'label' => 'Moyen de paiement'
             ])
-            ->add('valeur', TextType::class)
+            ->add('valeur', TextType::class, [
+                'attr' => ['placeholder' => '0.00']
+            ])
             ->add('Enregistrer', SubmitType::class, ['attr' => ['class' => 'btn-primary']]);
     }
 

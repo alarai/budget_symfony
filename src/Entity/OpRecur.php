@@ -58,6 +58,11 @@ class OpRecur implements \JsonSerializable
      */
     private $moyen;
 
+    public function __construct()
+    {
+        return $this->valeur = null;
+    }
+
     public function getIdopRecur(): ?int
     {
         return $this->idopRecur;
