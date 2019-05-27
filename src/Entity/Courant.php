@@ -83,6 +83,8 @@ class Courant implements \JsonSerializable
     {
         $this->date = new \DateTime();
         $this->opRecur = null;
+        $this->surcompte = false;
+        $this->valeur = null;
     }
 
     public function getIdcourant(): ?int

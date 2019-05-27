@@ -15,6 +15,7 @@ class BudgetController extends AbstractController {
      * @Route("/", name="home")
      */
     public function index() {
+
         return $this->render("current/current.html.twig");
     }
 
@@ -145,5 +146,19 @@ class BudgetController extends AbstractController {
         return new JsonResponse(["status" => true]);
     }
 
+    /**
+     * @Route("/current/api/totals", name="current_total")
+     */
+    public function apiTotals() {
+        $remainingTotal = $this->getDoctrine()->getRepository(Courant::class)->getRemainingTotal();
+        $remainingDone = $this->getDoctrine()->getRepository(Courant::class)->getRemainingPassed();
+        $remainingRecuring = $this->getDoctrine()->getRepository(OpRecur::class)->getNotUsedTotal();
+
+        return new JSonResponse([
+            "total" => $remainingTotal["valeur"],
+            "done" => $remainingDone["valeur"],
+            "recuring" => $remainingRecuring["valeur"],
+        ]);
+    }
 }
 

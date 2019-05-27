@@ -24,4 +24,21 @@ class CourantRepository extends ServiceEntityRepository
 
         return $qb->execute();
     }
+
+    public function getRemainingPassed() {
+        $qb = $this->createQueryBuilder('c')
+            ->select("SUM(c.valeur) AS valeur")
+            ->andWhere('c.surcompte = 1')
+            ->getQuery();
+
+        return $qb->execute()[0];
+    }
+
+    public function getRemainingTotal() {
+        $qb = $this->createQueryBuilder('c')
+            ->select("SUM(c.valeur) AS valeur")
+            ->getQuery();
+
+        return $qb->execute()[0];
+    }
 }

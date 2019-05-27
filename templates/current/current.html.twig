@@ -16,6 +16,17 @@
         {%  endfor %}
     {% endfor %}
 
+    <div class="row" style="padding-bottom: 10px; padding-top: 10px;">
+        <div class="col-sm-6 col-xs-12">
+            <strong>Reste sur compte :</strong>
+            <span id="txtReste"></span>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <strong>Reste prévisionnel fin de mois :</strong>
+            <span id="txtPrevis"></span>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-xs-12">
             <form class="form-inline">
@@ -103,6 +114,19 @@
             });
         }
 
+        function loadTotals() {
+            $.ajax({
+                url: "{{ path('current_total') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $("#txtReste").text(Number.parseFloat(data.done).toFixed(2));
+                    $("#txtPrevis").text((Number.parseFloat(data.total) + Number.parseFloat(data.recuring)).toFixed(2));
+                },
+                cache: false
+            });
+        }
+
         function changeStatus(id, state) {
             $.ajax({
                 url: "{{ path('current_status') }}/" + id + "/" + (state?1:0),
@@ -111,6 +135,7 @@
                 success: function(data) {
                    dataTable.ajax.reload();
                    updateChart();
+                   loadTotals();
                 },
                 cache: false
             });
@@ -129,6 +154,7 @@
                 success: function(data) {
                     dataTable.ajax.reload();
                     updateChart();
+                    loadTotals();
                 },
                 cache: false
             });
@@ -245,6 +271,7 @@
             chart = Highcharts.chart('currentChart', options);
             updateChart();
             loadOpRecurNotUsed();
+            loadTotals();
 
             $("#ddlOpRecur").change(function() {
                 $("#btnAddRecur").attr('disabled', $("#ddlOpRecur option:selected").val() === "-1");
@@ -275,8 +302,9 @@
                 selectedRemoval = null;
             });
             $(document).on('click', ".actionStatus", function() {
+                newState = !$(this).find('i').hasClass('text-success');
                 $(this).find('i').removeClass('text-success text-danger fa-check fa-times').addClass('fa-spinner fa-spin');
-                changeStatus($(this).data('id'), !$(this).find('i').hasClass('text-success'));
+                changeStatus($(this).data('id'), newState);
             });
             $(document).on('click', ".actionRemove", function() {
                 $(this).find('i').removeClass('fa-trash').addClass('fa-spinner fa-spin');
