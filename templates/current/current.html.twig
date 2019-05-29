@@ -38,6 +38,8 @@
                       </select>
                 </div>
                 <a class="btn btn-primary" id="btnAddRecur" disabled="disabled">Ajouter</a>
+                Ou
+                <a class="btn btn-primary" id="btnHistorize">Historiser</a>
             </form>
         </div>
     </div>
@@ -82,6 +84,36 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnConfirm">Confirmer</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="historizeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="histoYear">Année</label>
+                        <input type="text" class="form-control" id="histoYear" value="{{ "now" | date('Y') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="histoMonth">Mois</label>
+                        <input type="text" class="form-control" id="histoMonth"value="{{ "now" | date('m') }}">
+                    </div>
+                    <p>Êtes vous sûr de vouloir historiser les opérations  ?<br />
+                        Cette action ne peut être annulée.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnConfirmHistorize">Confirmer</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
                 </div>
             </div>
@@ -300,6 +332,25 @@
             $("#confirmRemove").on('hide.bs.modal', function() {
                 selectedRemoval.find('i').removeClass('fa-spinner fa-spin').addClass('fa-trash');
                 selectedRemoval = null;
+            });
+            $("#btnHistorize").click(function() {
+                $("#historizeModal").modal('show');
+            });
+            $("#btnConfirmHistorize").click(function () {
+                $.ajax({
+                    url: "{{ path('current_historize') }}/" + $("#histoYear").val() + "/" + $("#histoMonth").val(),
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        updateChart();
+                        loadOpRecurNotUsed();
+                        dataTable.ajax.reload();
+
+                        $("#historizeModal").modal('hide');
+                    },
+                    cache: false
+                });
+
             });
             $(document).on('click', ".actionStatus", function() {
                 newState = !$(this).find('i').hasClass('text-success');

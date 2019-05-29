@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Categories;
 use App\Entity\Courant;
+use App\Entity\Moyen;
 use App\Form\CurrentType;
 use App\Entity\OpRecur;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -159,6 +161,38 @@ class BudgetController extends AbstractController {
             "done" => $remainingDone["valeur"],
             "recuring" => $remainingRecuring["valeur"],
         ]);
+    }
+    /**
+     * @Route("/current/api/historize/{year<\d+>}/{month<\d+>}", name="current_historize", defaults={"month"=-1, "year"=-1})
+     */
+    public function historize($year, $month) {
+        if(!preg_match('/^20[0-9]{2}$/', $year) || !preg_match('/^1[0-2]$|^0?[1-9]$/', $month)) {
+            return new JsonResponse(["status" => false]);;
+        }
+
+        $repoCourant = $this->getDoctrine()->getRepository(Courant::class);
+        $remain = $repoCourant->getRemainingPassed()["valeur"];
+
+        $repoCourant->historizeData($month, $year);
+        $repoCourant->removeAllPassedOperations();
+
+        $moyen = $this->getDoctrine()->getRepository(Moyen::class)->find(5);
+        $categorie = $this->getDoctrine()->getRepository(Categories::class)->find(27);
+
+
+
+        $courant = new Courant();
+        $courant->setValeur($remain);
+        $courant->setMoyen($moyen);
+        $courant->setCategorie($categorie);
+        $courant->setSurcompte(true);
+        $courant->setNom("Reste mois - 1");
+
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($courant);
+        $manager->flush();
+
+        return new JsonResponse(["status" => true]);;
     }
 }
 

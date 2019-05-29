@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Courant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 class CourantRepository extends ServiceEntityRepository
 {
@@ -40,5 +41,23 @@ class CourantRepository extends ServiceEntityRepository
             ->getQuery();
 
         return $qb->execute()[0];
+    }
+
+    public function removeAllPassedOperations() {
+        return $this->createQueryBuilder('c')->delete()->where('c.surcompte = 1')->getQuery()->execute();
+    }
+
+    public function historizeData($month, $year) {
+        $db = $this->getEntityManager()->getConnection();
+
+        $sql = "INSERT INTO historique(mois, annee, nom, date, categorie, moyen, op_recur, valeur) 
+                    SELECT ? AS mois, ? AS annee, nom, date, categorie, moyen, op_recur, valeur 
+                    FROM courant
+                    WHERE surcompte = 1";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(1, $month, \PDO::PARAM_INT);
+        $stmt->bindParam(2, $year, \PDO::PARAM_INT);
+        $stmt->execute();
     }
 }
