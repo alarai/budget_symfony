@@ -187,6 +187,7 @@
                     dataTable.ajax.reload();
                     updateChart();
                     loadTotals();
+                    loadOpRecurNotUsed();
                 },
                 cache: false
             });
@@ -317,6 +318,7 @@
                         success: function(data) {
                             loadOpRecurNotUsed();
                             dataTable.ajax.reload();
+                            loadTotals();
                         },
                         cache: false
                     });
