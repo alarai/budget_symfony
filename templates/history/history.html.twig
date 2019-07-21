@@ -54,7 +54,7 @@
             {% for monthyear in liste %}
             {%  if loop.index0 > 0 %},{% endif %}{id: {{ loop.index0 }}, month: {{ monthyear.mois|pad(2,'0',true) }}, year: {{ monthyear.annee }}, text:'{{ monthyear.annee }}/{{ monthyear.mois|pad(2,'0',true) }}'}
             {% endfor %}];
-        var current ='2019/05';
+        var current = monthList[0];
 
         function refreshBtns() {
             $("#btnPrevPeriod").attr('disabled', true);
@@ -116,7 +116,7 @@
             });
 
             dataTable = $("#historyTable").DataTable( {
-                "ajax": "{{ path('history_list', {'year': annee, 'month': mois}) }}",
+                "ajax": "{{ path('history_list') }}/" + $("#ddlPeriod option:selected").text(),
                 "columns": [
                     { "data": "date" },
                     { "data": "nom" },
