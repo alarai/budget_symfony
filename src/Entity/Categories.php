@@ -44,6 +44,4 @@ class Categories
 
         return $this;
     }
-
-
 }

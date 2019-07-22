@@ -8,8 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class HistoryController extends AbstractController {
-
+class HistoryController extends AbstractController
+{
     private $repository;
 
     public function __construct(HistoriqueRepository $repository)
@@ -20,9 +20,14 @@ class HistoryController extends AbstractController {
     /**
      * @Route("/history/{year<\d+>}/{month<\d+>}", name="history", defaults={"year"=-1, "month"=-1})
      */
-    public function index($year, $month) {
-        if($year === -1) { $year = date('Y'); }
-        if($month === -1) { $month = date('m'); }
+    public function index($year, $month)
+    {
+        if ($year === -1) {
+            $year = date('Y');
+        }
+        if ($month === -1) {
+            $month = date('m');
+        }
 
 
         return $this->render("history/history.html.twig", [
@@ -35,7 +40,8 @@ class HistoryController extends AbstractController {
     /**
      * @Route("/history/api/list/{year<\d+>}/{month<\d+>}", name="history_list", defaults={"year"=-1, "month"=-1})
      */
-    public function list($year, $month) {
+    public function list($year, $month)
+    {
         $data = $this->repository->findBy(['mois' => $month, 'annee' => $year]);
 
         $response = new JsonResponse([
@@ -47,8 +53,8 @@ class HistoryController extends AbstractController {
     /**
      * @Route("/history/api/listbycat/{year<\d+>}/{month<\d+>}", name="history_listcat", defaults={"year"=-1, "month"=-1})
      */
-    public function listByCategory($year, $month) {
-
+    public function listByCategory($year, $month)
+    {
         $data = $this->repository->getMonthListByCat($year, $month);
 
         $response = new JsonResponse([
@@ -64,12 +70,10 @@ class HistoryController extends AbstractController {
     /**
      * @Route("/graphics", name="graphics")
      */
-    public function historyGraphic() {
-
+    public function historyGraphic()
+    {
         $data = $this->repository->chartHistoryData(2016);
 
         return $this->render('graphics/graphics.html.twig', ['data' => $data]);
     }
-
 }
-

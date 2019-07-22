@@ -46,6 +46,4 @@ class Moyen
 
         return $this;
     }
-
-
 }

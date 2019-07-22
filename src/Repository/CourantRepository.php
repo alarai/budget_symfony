@@ -14,7 +14,8 @@ class CourantRepository extends ServiceEntityRepository
         parent::__construct($registry, Courant::class);
     }
 
-    public function getByCategorie() {
+    public function getByCategorie()
+    {
         $qb = $this->createQueryBuilder('c')
             ->select("ABS(SUM(c.valeur)) AS y, cat.nom AS name")
             ->innerJoin('App\Entity\Categories', 'cat', 'WITH', 'c.categorie = cat.idcategories')
@@ -26,7 +27,8 @@ class CourantRepository extends ServiceEntityRepository
         return $qb->execute();
     }
 
-    public function getRemainingPassed() {
+    public function getRemainingPassed()
+    {
         $qb = $this->createQueryBuilder('c')
             ->select("SUM(c.valeur) AS valeur")
             ->andWhere('c.surcompte = 1')
@@ -35,7 +37,8 @@ class CourantRepository extends ServiceEntityRepository
         return $qb->execute()[0];
     }
 
-    public function getRemainingTotal() {
+    public function getRemainingTotal()
+    {
         $qb = $this->createQueryBuilder('c')
             ->select("SUM(c.valeur) AS valeur")
             ->getQuery();
@@ -43,11 +46,13 @@ class CourantRepository extends ServiceEntityRepository
         return $qb->execute()[0];
     }
 
-    public function removeAllPassedOperations() {
+    public function removeAllPassedOperations()
+    {
         return $this->createQueryBuilder('c')->delete()->where('c.surcompte = 1')->getQuery()->execute();
     }
 
-    public function historizeData($month, $year) {
+    public function historizeData($month, $year)
+    {
         $db = $this->getEntityManager()->getConnection();
 
         $sql = "INSERT INTO historique(mois, annee, nom, date, categorie, moyen, op_recur, valeur) 

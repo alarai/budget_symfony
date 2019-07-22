@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class BudgetController extends AbstractController {
-
+class BudgetController extends AbstractController
+{
     use EntityGetter;
 
     private $entityManager;
@@ -32,15 +32,16 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/", name="home")
      */
-    public function index() {
-
+    public function index()
+    {
         return $this->render("current/current.html.twig");
     }
 
     /**
      * @Route("/current/api/list", name="current_list")
      */
-    public function list() {
+    public function list()
+    {
         $data = $this->repository->findAll();
 
         $response = new JsonResponse([
@@ -52,7 +53,8 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/api/listbycat", name="current_listcat")
      */
-    public function listByCategory() {
+    public function listByCategory()
+    {
         $data = $this->repository->getByCategorie();
 
         $response = new JsonResponse([
@@ -68,10 +70,11 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/edit/{id<\d+>}", name="current_edit", defaults={"id"=null})
      */
-    public function edit($id, Request $request) {
+    public function edit($id, Request $request)
+    {
         $current = $this->getEntity($id, Courant::class);
 
-        if($current === null) {
+        if ($current === null) {
             return $this->redirectToRoute('home');
         }
 
@@ -92,10 +95,10 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/api/remove/{id<\d+>}", name="current_remove", defaults={"id"=-1})
      */
-    public function remove($id) {
-
+    public function remove($id)
+    {
         $item = $this->repository->find($id);
-        if($item != null) {
+        if ($item != null) {
             $this->entityManager->remove($item);
             $this->entityManager->flush();
         }
@@ -103,15 +106,15 @@ class BudgetController extends AbstractController {
         return new JsonResponse([
             "status" => $item!=null,
         ]);
-
     }
 
     /**
      * @Route("/current/api/status/{id<\d+>}/{state<\d+>}", name="current_status", defaults={"id"=-1, "state"=-1})
      */
-    public function status($id, $state) {
+    public function status($id, $state)
+    {
         $item = $this->repository->find($id);
-        if($item != null) {
+        if ($item != null) {
             $item->setSurcompte($state==="1");
             $this->entityManager->persist($item);
             $this->entityManager->flush();
@@ -125,14 +128,15 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/api/addrecur/{id<\d+>}", name="current_addrecur", defaults={"id"=-1})
      */
-    public function addRecuringOperation($id) {
+    public function addRecuringOperation($id)
+    {
         $opRecur = $this->getDoctrine()->getRepository(OpRecur::class)->find($id);
-        if($opRecur == null) {
+        if ($opRecur == null) {
             return new JsonResponse(["status" => false, "message" => "Recuring Not found"]);
         }
 
         $itemExist = $this->repository->findBy(["opRecur" => $id]);
-        if($itemExist) {
+        if ($itemExist) {
             return new JsonResponse(["status" => false, "message" => "Recuring already added"]);
         }
 
@@ -154,7 +158,8 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/api/totals", name="current_total")
      */
-    public function apiTotals() {
+    public function apiTotals()
+    {
         $remainingTotal = $this->repository->getRemainingTotal();
         $remainingDone = $this->repository->getRemainingPassed();
         $remainingRecuring = $this->getDoctrine()->getRepository(OpRecur::class)->getNotUsedTotal();
@@ -168,9 +173,11 @@ class BudgetController extends AbstractController {
     /**
      * @Route("/current/api/historize/{year<\d+>}/{month<\d+>}", name="current_historize", defaults={"month"=-1, "year"=-1})
      */
-    public function historize($year, $month) {
-        if(!preg_match('/^20[0-9]{2}$/', $year) || !preg_match('/^1[0-2]$|^0?[1-9]$/', $month)) {
-            return new JsonResponse(["status" => false]);;
+    public function historize($year, $month)
+    {
+        if (!preg_match('/^20[0-9]{2}$/', $year) || !preg_match('/^1[0-2]$|^0?[1-9]$/', $month)) {
+            return new JsonResponse(["status" => false]);
+            ;
         }
 
         $remain = $this->repository->getRemainingPassed()["valeur"];
@@ -193,7 +200,7 @@ class BudgetController extends AbstractController {
         $this->entityManager->persist($courant);
         $this->entityManager->flush();
 
-        return new JsonResponse(["status" => true]);;
+        return new JsonResponse(["status" => true]);
+        ;
     }
 }
-

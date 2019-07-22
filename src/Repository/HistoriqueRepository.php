@@ -13,7 +13,8 @@ class HistoriqueRepository extends ServiceEntityRepository
         parent::__construct($registry, Historique::class);
     }
 
-    public function getMonthList($limit = -1) {
+    public function getMonthList($limit = -1)
+    {
         $qb = $this->createQueryBuilder('h')
                     ->select(['h.annee', 'h.mois'])
                     ->groupBy('h.annee')
@@ -21,7 +22,7 @@ class HistoriqueRepository extends ServiceEntityRepository
                     ->orderBy('h.annee', 'DESC')
                     ->addOrderBy('h.mois', 'DESC');
 
-        if($limit != -1) {
+        if ($limit != -1) {
             $qb = $qb->setMaxResults($limit);
         }
 
@@ -29,7 +30,8 @@ class HistoriqueRepository extends ServiceEntityRepository
         return $qb->getQuery()->execute();
     }
 
-    public function getMonthListByCat($year, $month) {
+    public function getMonthListByCat($year, $month)
+    {
         $qb = $this->createQueryBuilder('h')
             ->select("ABS(SUM(h.valeur)) AS y, cat.nom AS name")
             ->innerJoin('App\Entity\Categories', 'cat', 'WITH', 'h.categorie = cat.idcategories')
@@ -45,7 +47,8 @@ class HistoriqueRepository extends ServiceEntityRepository
         return $qb->execute();
     }
 
-    public function chartHistoryData($yearMin) {
+    public function chartHistoryData($yearMin)
+    {
         $db = $this->getEntityManager()->getConnection();
 
         $sql = "    SELECT CONCAT(CAST(mois AS Char),'/',CAST(annee AS CHAR)) AS period,  ROUND(SUM(valeur),2) AS somme

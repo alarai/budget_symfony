@@ -20,3 +20,8 @@
 ###>phpstorm ###
 /.idea
 ###< phpstorm ###
+
+
+###>php-cs-fixer ###
+.php_cs.cache
+###<php-cs-fixer ###

@@ -14,7 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class CurrentType extends AbstractType {
+class CurrentType extends AbstractType
+{
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder

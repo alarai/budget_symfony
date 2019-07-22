@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class PaymentController extends AbstractController  {
+class PaymentController extends AbstractController
+{
     use EntityGetter;
 
     private $entityManager;
@@ -27,7 +28,8 @@ class PaymentController extends AbstractController  {
     /**
      * @Route("/payment", name="payment")
      */
-    public function index() {
+    public function index()
+    {
         $paymentList = $this->repository->findBy([], ["nom" => "ASC"]);
 
         return $this->render('payment/payment.html.twig', ["payments" => $paymentList]);
@@ -36,11 +38,11 @@ class PaymentController extends AbstractController  {
     /**
      * @Route("/payment/edit/{id<\d+>}", name="payment_edit", defaults={"id"=null})
      */
-    public function edit($id, Request $request) {
-
+    public function edit($id, Request $request)
+    {
         $payment = $this->getEntity($id, Moyen::class);
 
-        if($payment === null) {
+        if ($payment === null) {
             return $this->redirectToRoute('payment');
         }
 
@@ -57,5 +59,4 @@ class PaymentController extends AbstractController  {
 
         return $this->render('payment/edit.html.twig', ['form' => $form->createView()]);
     }
-
 }

@@ -198,6 +198,4 @@ class Historique implements \JsonSerializable
             'nomCategorie' => $this->getCategorie()->getNom(),
         );
     }
-
-
 }

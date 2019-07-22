@@ -126,5 +126,4 @@ class OpRecur implements \JsonSerializable
             'nomCategorie' => $this->getCategorie()->getNom(),
         );
     }
-
 }

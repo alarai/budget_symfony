@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Traits\EntityGetter;
 
-class CategoryController extends AbstractController {
+class CategoryController extends AbstractController
+{
     use EntityGetter;
 
     private $entityManager;
@@ -27,8 +28,8 @@ class CategoryController extends AbstractController {
     /**
      * @Route("/category", name="category")
      */
-    public function index() {
-
+    public function index()
+    {
         $categories = $this->repository->findBy([], ['nom' => 'ASC']);
 
         return $this->render("category/category.html.twig", ['categories' => $categories]);
@@ -37,10 +38,11 @@ class CategoryController extends AbstractController {
     /**
      * @Route("/category/edit/{id<\d+>}", name="category_edit", defaults={"id"=null})
      */
-    public function edit($id, Request $request) {
+    public function edit($id, Request $request)
+    {
         $category = $this->getEntity($id, Categories::class);
 
-        if($category === null) {
+        if ($category === null) {
             return $this->redirectToRoute('category');
         }
 
@@ -57,5 +59,4 @@ class CategoryController extends AbstractController {
 
         return $this->render('category/edit.html.twig', ['form' => $form->createView()]);
     }
-
 }

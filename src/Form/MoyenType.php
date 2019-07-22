@@ -9,7 +9,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-class MoyenType extends AbstractType {
+class MoyenType extends AbstractType
+{
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('nom', TextType::class)

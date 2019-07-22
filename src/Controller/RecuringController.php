@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class RecuringController extends AbstractController {
+class RecuringController extends AbstractController
+{
     use EntityGetter;
 
     private $entityManager;
@@ -28,8 +29,8 @@ class RecuringController extends AbstractController {
     /**
      * @Route("/recuring", name="recuring")
      */
-    public function index() {
-
+    public function index()
+    {
         $recuringOps = $this->repository->findBy([], ["nom" => 'ASC']);
 
         return $this->render("recuring/recuring.html.twig", ["ops" => $recuringOps]);
@@ -38,10 +39,11 @@ class RecuringController extends AbstractController {
     /**
      * @Route("/recuring/edit/{id<\d+>}", name="recuring_edit", defaults={"id"=null})
      */
-    public function edit($id, Request $request) {
+    public function edit($id, Request $request)
+    {
         $recuring = $this->getEntity($id, OpRecur::class);
 
-        if($recuring === null) {
+        if ($recuring === null) {
             return $this->redirectToRoute('recuring');
         }
 
@@ -62,12 +64,12 @@ class RecuringController extends AbstractController {
     /**
      * @Route("/recuring/api/listnotused", name="recuring_notused")
      */
-    public function listNotUsedOperations() {
+    public function listNotUsedOperations()
+    {
         $opRecurList = $this->repository->getNotUsedInCourant();
 
         return new JsonResponse(
             ["data" => $opRecurList]
         );
     }
-
 }
