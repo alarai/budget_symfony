@@ -68,6 +68,32 @@ class HistoryController extends AbstractController
     }
 
     /**
+     * @Route("/history/api/data/{year<\d+>}/{month<\d+>}", name="history_listdata", defaults={"year"=-1, "month"=-1})
+     */
+    public function listData($year, $month)
+    {
+        $dataChart = $this->repository->getMonthListByCat($year, $month);
+        $dataList = $this->repository->findBy(['mois' => $month, 'annee' => $year]);
+
+        $response = new JsonResponse([
+            "charts" => [
+                "id" => 'expenses',
+                "name" => 'Dépenses',
+                "animation" => false,
+                "colorByPoint" => true,
+                "data" => $dataChart
+            ],
+            "list" => [
+                "data" => $dataList
+            ],
+            "monthList" => [
+                "data" => $this->repository->getMonthList()
+            ]
+        ]);
+        return $response;
+    }
+
+    /**
      * @Route("/graphics", name="graphics")
      */
     public function historyGraphic()

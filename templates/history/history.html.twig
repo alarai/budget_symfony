@@ -50,11 +50,6 @@
     <script>
         var dataTable;
         var chart;
-        var monthList = [
-            {% for monthyear in liste %}
-            {%  if loop.index0 > 0 %},{% endif %}{id: {{ loop.index0 }}, month: {{ monthyear.mois|pad(2,'0',true) }}, year: {{ monthyear.annee }}, text:'{{ monthyear.annee }}/{{ monthyear.mois|pad(2,'0',true) }}'}
-            {% endfor %}];
-        var current = monthList[0];
 
         function refreshBtns() {
             $("#btnPrevPeriod").attr('disabled', true);
